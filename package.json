@@ -1,13 +1,13 @@
 {
-  "name": "forever-monitor-test",
+  "name": "forever-monitor-apithing",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "hackerjef",
+  "license": "Unlicense",
+  "description": "A Thing I made...",
   "dependencies": {
     "forever-monitor": "^1.7.1",
     "memory-cache": "^0.2.0",
