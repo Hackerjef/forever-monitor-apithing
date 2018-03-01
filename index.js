@@ -11,6 +11,8 @@ var child = new (forever.Monitor)("second-js.js", {
 //status function
 const childmemory = function (child, method) {
   var cache = require("memory-cache");
+  var timediff = require("timediff");
+  let date = require("date-and-time");
   switch (method) {
   case "startup": {
     cache.put("state","off");
@@ -21,25 +23,33 @@ const childmemory = function (child, method) {
     break;
   }
   case "start": {
+    let now = new Date();
     cache.put("state", "on");
-    cache.put("botstartTime", Date.now());
+    cache.put("botstartTime", date.format(now, "YYYY-MM-DD HH:mm:ss"));
+    cache.put("botstopTime", "null");
     break;
   }
   case "stop": {
-    cache.put("botstopTime", Date.now());
+    let now = new Date();
+    cache.put("botstopTime", date.format(now, "YYYY-MM-DD HH:mm:ss"));
     cache.put("state", "off");
     break;
   }
   case "data": {
-    var uptime = function(start, stop) {
-      var secConverter = require("seconds-converter");
-      return secConverter(`${(stop - start) / 1000}`, "sec");
+    var stoptime = function (botstoptime) {
+      if (botstoptime == "null") return "Bot currently Running, No Stop time.";
+      return botstoptime;
+    };
+    var uptime = function(start, stoptime) {
+      let now = new Date();
+      if (stoptime == "Bot currently Running, No Stop time.") stoptime = date.format(now, "YYYY-MM-DD HH:mm:ss");
+      return timediff(start, stoptime, "YDHms");
     };
     return {
       "Status": cache.get("state"),
-      "Start_Date": cache.get("botstartTime"),
-      "Stop_Date": cache.get("botstopTime"),
-      "CurrentUptime": uptime(cache.get("botstartTime"), cache.get("botstopTime"))
+      "Start_time": cache.get("botstartTime"),
+      "Stop_time": stoptime(cache.get("botstopTime")),
+      "uptime": uptime(cache.get("botstartTime"), stoptime(cache.get("botstopTime")))
     };
   }
   case "status": {
@@ -54,7 +64,7 @@ const childmemory = function (child, method) {
 child.on("exit", function () {
   console.log("the program stoped");
   childmemory(child, "stop");
-  console.log(childmemory("data"));
+  console.log(childmemory(child, "data"));
 });
 
 //do if child started
