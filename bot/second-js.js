@@ -1,4 +1,4 @@
-for (var i = 0; i < 10; i++) {
+for (var i = 0; i < 100000000; i++) {
   console.log(i);
 }
-process.exit(1);
+process.exit(0);

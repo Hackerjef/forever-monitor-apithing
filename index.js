@@ -12,7 +12,6 @@ var child = new (forever.Monitor)("second-js.js", {
 const childmemory = function (child, method) {
   var cache = require("memory-cache");
   var timediff = require("timediff");
-  let date = require("date-and-time");
   switch (method) {
   case "startup": {
     cache.put("state","off");
@@ -23,6 +22,7 @@ const childmemory = function (child, method) {
     break;
   }
   case "start": {
+    let date = require("date-and-time");
     let now = new Date();
     cache.put("state", "on");
     cache.put("botstartTime", date.format(now, "YYYY-MM-DD HH:mm:ss"));
@@ -30,6 +30,7 @@ const childmemory = function (child, method) {
     break;
   }
   case "stop": {
+    let date = require("date-and-time");
     let now = new Date();
     cache.put("botstopTime", date.format(now, "YYYY-MM-DD HH:mm:ss"));
     cache.put("state", "off");
@@ -41,25 +42,31 @@ const childmemory = function (child, method) {
       return botstoptime;
     };
     var uptime = function(start, stoptime) {
+      let date = require("date-and-time");
       let now = new Date();
-      if (stoptime == "Bot currently Running, No Stop time.") stoptime = date.format(now, "YYYY-MM-DD HH:mm:ss");
-      return timediff(start, stoptime, "YDHms");
+      var stoptime2 = stoptime;
+      if (stoptime == "null") stoptime2 = date.format(now, "YYYY-MM-DD HH:mm:ss");
+      var timediffrence = timediff(start, stoptime2, "YDHms");
+      return timediffrence;
     };
     return {
       "Status": cache.get("state"),
       "Start_time": cache.get("botstartTime"),
       "Stop_time": stoptime(cache.get("botstopTime")),
-      "uptime": uptime(cache.get("botstartTime"), stoptime(cache.get("botstopTime")))
+      "uptime": uptime(cache.get("botstartTime"), cache.get("botstopTime"))
     };
   }
   case "status": {
-    return cache.get("state");
+    return {
+      "Status": cache.get("state")
+    };
   }
   default: {
     return "novaluesent";
   }
   }
 };
+
 //do if child exited
 child.on("exit", function () {
   console.log("the program stoped");
